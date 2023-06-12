@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<IBlogDbContext>(options =>            //od 9-10 linije koda je vezana za injection dbconnectionstringa iz appsettings.json
+builder.Services.AddDbContext<IBlogDbContext>(options =>           
 options.UseSqlServer(builder.Configuration.GetConnectionString("IBlogDbConnectionString")));
 
 builder.Services.AddDefaultIdentity<Profile>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<IBlogDbContext>();
