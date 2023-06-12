@@ -126,27 +126,11 @@
         </div>
     </div>
 </div>
-
-@*Ovde si probao da ubacis dropdown za comments i raqdi samo sto aktivira samo jedan dropdown na koje god dugme comments da se klikne*@
-@*<script>
-    function toggleComments() {
-
-        var x = document.getElementById("comments-container");
-        if (x.style.display === "none") {
-            x.style.display = "block";
-
-        } else {
-            x.style.display = "none";
-        }
-    }
-</script>*@
 <script>
     const btnLikeElement = document.querySelectorAll('[id^="btnLike"]');
 
-
     async function likePost() {
         const btnLikeElement = this;
-
 
         fetch('/api/LikeApi/Like', {
             method: 'POST',
@@ -164,7 +148,6 @@
             newIcon.classList.add('bi', 'bi-suit-heart-fill');
             newIcon.style.color = '#ed2939';
             btnLikeElement.replaceWith(newIcon);
-            // Osvežavanje stranice
             location.reload();
         });
     }
@@ -173,7 +156,6 @@
         btnLikeElement.addEventListener('click', likePost);
     });
 
-
 </script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
@@ -181,11 +163,9 @@
         const btnCommentElement = event.target;
         var comment = btnCommentElement.parentNode.querySelector('.form-control').value;
 
-        // Uzimamo vrednosti atributa data-currentUser i data-postId sa dugmeta za slanje komentara
         var currentUser = btnCommentElement.getAttribute('data-currentUser');
         var postId = btnCommentElement.getAttribute('data-postId');
 
-        // Kreiramo objekat sa podacima za slanje u kontroler
         var data = {
             userId: currentUser,
             postId: postId,
@@ -203,15 +183,12 @@
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                // Osvežavanje stranice
                 location.reload();
             })
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);
             });
     }
-
-    // Postavljamo event listenere za dugmad za slanje komentara
     var btnCommentElements = document.querySelectorAll('.btnComment');
     btnCommentElements.forEach(btnCommentElement => {
         btnCommentElement.addEventListener('click', commentPost);
