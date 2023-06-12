@@ -1,0 +1,79 @@
+﻿@using IBlogs.Models.Domain;
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Profile> signInManager
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - IBlogs</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/IBlogs.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css">
+</head>
+<body class="bg-black">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light box-shadow bg-transparent" style="z-index:10;">
+            <div class="container-fluid">
+                <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="Index"><img class="logo" src="~/Images/IBlogsLogoVector.png" /></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between px-3">
+                    <ul class="navbar-nav text-light flex-grow-1 px-5">
+                        <li class="nav-item me-3">
+                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">About Us</a>
+                        </li>
+                        <li class="nav-item me-3">
+                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-area="" asp-controller="Creators" asp-action="List">See All Creators</a>
+                        </li>
+                        
+                    </ul>
+                     @if (signInManager.IsSignedIn(User))
+                        {
+                            <a class="align-items-center me-5" asp-controller="Forum" asp-action="Room"><img src="~/Images/SocialThoughtVector.png" style="width:100px;" /></a>
+                           <a class="btn me-3 bg-dark text-light"
+                                asp-controller="Profile"
+                                asp-action="MyProfile"
+                                asp-route-id="@signInManager.UserManager.GetUserAsync(User).Result.ProfileId">
+                           
+                                Profile
+
+                           </a>
+
+                        }
+                        else
+                        {
+                        <a class="align-items-center me-5" asp-area="Identity" asp-page="/Account/Login"><img src="~/Images/SocialThoughtVector.png" style="width:100px;" /></a>
+                            <a class="btn me-3 bg-dark text-light"
+                               asp-area="Identity"
+                               asp-page="/Account/Login">
+                               Register
+                          
+
+                            </a>
+                        }
+                </div>
+            </div>
+        </nav>
+       
+    </header>
+    
+    <div>
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

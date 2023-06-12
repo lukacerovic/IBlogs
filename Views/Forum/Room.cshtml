@@ -1,0 +1,109 @@
+﻿@using IBlogs.Models.Domain;
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Profile> signInManager
+@inject UserManager<Profile> userManager
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - IBlogs</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/IBlogs.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css">
+    <style>
+        /* Postavljanje slike kao pozadine */
+        body {
+            background-image: url(/Images/SocialBackground.png);
+            background-size: cover;
+            background-position: center center;
+            height: 100vh;
+            weight: 100%;
+        }
+
+        /* Stilizacija sivog bloka */
+        input{
+            width:80%;
+            border-radius:30px;
+            background:white;
+            padding-left:10px;
+        }
+        
+       
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+
+            <div class="col-12 col-lg-6 w-75">
+
+                <div class="blok text-light text-light">
+
+                    <div class="mb-3 mb-3" style="border-radius:30px;">
+                        <div class="row  bg-dark">
+                            <div class="text-center">
+                                
+                                <img src="~/Images/TreciLogo.png" style="width:80px;"/>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="container" style="height:70vh;overflow-y:scroll;background:transparent;">
+                            <ul id="discussion" style="padding-right:5px;">
+                                
+                            </ul>
+                        </div>
+                        <div class="bg-dark d-flex py-3 px-3 ">
+                            <input type="text" id="message" placeholder="Type here..."/>
+                            <button type="button" id="sendmessage" class="btn btn-primary px-3 ms-5">Send</button>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <script src="
+        https://cdn.jsdelivr.net/npm/@@microsoft/signalr@7.0.5/dist/browser/signalr.min.js
+    "></script>
+    <script>
+        var connection = new signalR.HubConnectionBuilder().withUrl("/chat").build();
+
+        connection.start().catch(function (err){
+            return console.error(err.toString());
+        });
+
+        document.getElementById("sendmessage").addEventListener("click", function (event){
+            var message = document.getElementById("message").value;
+            var user = "@signInManager.UserManager.GetUserAsync(User).Result.Name" + " " + "@signInManager.UserManager.GetUserAsync(User).Result.LastName";
+
+            connection.invoke("SendMessage", user, message).catch(function (err) {
+                return console.error(err.toString());
+            });
+            document.getElementById("message").value = "";
+            event.preventDefault();
+        });
+
+        connection.on("ReceiveMessage", function (user, message) {
+            console.log("Evo je Receive Message Metoda");
+            var encodeMsg = user + ":  " + message;
+            var li = document.createElement("li");
+
+            li.textContent = encodeMsg;
+            li.classList.add("bg-dark", "bg-gradient", "p-3", "rounded-3", "mb-3")
+            document.getElementById("discussion").appendChild(li);
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,222 @@
+﻿@model List<IBlogs.Models.ViewModels.PostDetailsViewModel>
+@using IBlogs.Models.Domain;
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Profile> signInManager
+@inject UserManager<Profile> userManager
+@{
+    ViewData["Title"] = "Home Page";
+
+    if (@signInManager.IsSignedIn(User))
+    {
+        var logedInUser = @signInManager.UserManager.GetUserAsync(User).Result.ProfileId;
+    }
+    else
+    {
+        var logedInUser = 0;
+      
+    }
+}
+@{
+    // if you want to set that last post is presented at the top:
+    var reversedModel = Model.ToList();
+    reversedModel.Reverse();
+}
+
+<div class="ms-3">
+   
+
+    <div class="row border-top">
+        <div class="col-md-4 mt-3 ms-5 pt-5">
+            <img src="~/Images/BlogSlika.jpg" style="width:100%;height:calc(100/0.5);" />
+        </div>
+        <div class="col-8 col-lg-6 text-light pt-5 border-bottom">
+            <h1 class="display-5 fw-bold lh-1 mb-3">
+                IBlogs
+            </h1>
+            <p class="lead me-3">
+                The IBlogs is a blog sharing platform where users can create accounts, publish their own blogs, and interact with other bloggers.
+                It includes features such as profile customization, blog creation with multimedia content, social media integration, and community engagement through likes, comments, and sharing. like-minded individuals.
+            </p>
+        </div>
+ 
+        <div class="container mt-5">
+            <h1 class="text-light text-center mb-3">All Posts</h1>
+            <div class="row justify-content-center text-light">
+                <div class="col-12 col-lg-6">
+                    @foreach (var post in reversedModel)
+                    {
+                        <div class="py-3 px-3 mb-5" style="background:#353839; border-radius:10px;">
+                            <div class="justify-content-center">
+
+                                <h3>@post.Title</h3>
+                                <h4>@post.Header</h4>
+                                <h5>
+                                    Topics:
+                                    @foreach (var topic in post.Topics.Split(','))
+                                    {
+                                        <span class="badge badge-sm bg-secondary m-1">@topic</span>
+                                    }
+                                </h5>
+                            </div>
+                            @if (@post.Image != null)
+                            {
+                                <img src="@Url.Action("GetImage", "Image", new { id = post.PostId })" style="width:100%;height:300px;" />
+                            }
+                            <div class="mt-3 mb-5">
+                                <p>@post.About</p>
+                            </div>
+                            <span>Author: @post.Name</span><span style="float:right;">Posted on date: @post.PostedDate</span>
+                            @if (signInManager.IsSignedIn(User))
+                            {
+                                <div class="col-12 text-end mt-3">
+                                    <hr class="bg-white">
+                                    <p class="fw-bold">Comments</p>
+                                </div>
+                                <div class="container pt-3" id="comments-container">
+                                    <div class="bg-black text-black py-3 px-3" id="allComments_@post.PostId" style="overflow-y:scroll;height:40vh;">
+                                        @foreach(var comment in post.AllComments)
+                                        {
+                                            <div class="mb-3 text-center text-light" style="background:linear-gradient(#00ffff, #663399);border-radius:30px;padding-top:5px;padding-bottom:5px;"><p class="px-3">@comment</p></div>
+                                        }
+                                    </div>
+                                    <div class="col-12 d-flex pt-3">
+                                        <input type="text" class="form-control w-75 text-light" name="comment" id="comment" style="border:1px solid white;border-radius:50px;background:transparent;" />
+                                        <button class="btn btn-primary ms-2 btnComment" id="btnComment" type="button"
+                                                data-currentUser="@signInManager.UserManager.GetUserAsync(User).Result.ProfileId"
+                                                data-postId="@post.PostId">
+                                            Comment
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+
+                            @if (signInManager.IsSignedIn(User))
+                            {
+                                @if (post.CheckLikeStatus == 0)
+                                {
+                                    <button class="btn btn-secondary text-end mt-3 mb-3 " type="submit">
+
+                                        Leave a like &ensp;
+
+                                        <i class="bi bi-suit-heart-fill" style="color:white;"
+                               id="btnLike"
+                               data-curentUser="@signInManager.UserManager.GetUserAsync(User).Result.ProfileId"
+                               data-postId="@post.PostId"
+                               data-ownerId="@post.CreatorId"></i> &ensp; @post.TotalLikes
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-secondary text-end mt-3 mb-3 " type="submit">
+                                        You already liked &ensp;
+                                        <i class="bi bi-suit-heart-fill" style="color:#ed2939;"></i> &ensp; @post.TotalLikes
+                                    </button>
+                                }
+
+                            }
+                            else
+                            {
+                                <a class="btn btn-secondary text-end mt-3 mb-3 " asp-area="Identity" asp-page="/Account/Login" datapostId="@post.PostId" dataownerId="@post.CreatorId">Leave a like &ensp;<i class="bi bi-suit-heart-fill" style="color:white;"></i></a>
+                            }
+
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*Ovde si probao da ubacis dropdown za comments i raqdi samo sto aktivira samo jedan dropdown na koje god dugme comments da se klikne*@
+@*<script>
+    function toggleComments() {
+
+        var x = document.getElementById("comments-container");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+
+        } else {
+            x.style.display = "none";
+        }
+    }
+</script>*@
+<script>
+    const btnLikeElement = document.querySelectorAll('[id^="btnLike"]');
+
+
+    async function likePost() {
+        const btnLikeElement = this;
+
+
+        fetch('/api/LikeApi/Like', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': '*/*'
+            },
+            body: JSON.stringify({
+                userWhoLiked: btnLikeElement.getAttribute("data-curentUser"),
+                likedPost: btnLikeElement.getAttribute("data-postId"),
+                ownerOfPost: btnLikeElement.getAttribute("data-ownerId")
+            })
+        }).then(() => {
+            const newIcon = document.createElement('i');
+            newIcon.classList.add('bi', 'bi-suit-heart-fill');
+            newIcon.style.color = '#ed2939';
+            btnLikeElement.replaceWith(newIcon);
+            // Osvežavanje stranice
+            location.reload();
+        });
+    }
+
+    btnLikeElement.forEach(btnLikeElement => {
+        btnLikeElement.addEventListener('click', likePost);
+    });
+
+
+</script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    function commentPost(event) {
+        const btnCommentElement = event.target;
+        var comment = btnCommentElement.parentNode.querySelector('.form-control').value;
+
+        // Uzimamo vrednosti atributa data-currentUser i data-postId sa dugmeta za slanje komentara
+        var currentUser = btnCommentElement.getAttribute('data-currentUser');
+        var postId = btnCommentElement.getAttribute('data-postId');
+
+        // Kreiramo objekat sa podacima za slanje u kontroler
+        var data = {
+            userId: currentUser,
+            postId: postId,
+            content: comment
+        };
+
+        fetch('/Comments/Post', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                // Osvežavanje stranice
+                location.reload();
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    }
+
+    // Postavljamo event listenere za dugmad za slanje komentara
+    var btnCommentElements = document.querySelectorAll('.btnComment');
+    btnCommentElements.forEach(btnCommentElement => {
+        btnCommentElement.addEventListener('click', commentPost);
+    });
+
+</script>
+
+

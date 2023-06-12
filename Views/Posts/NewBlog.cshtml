@@ -1,0 +1,96 @@
+﻿@model IBlogs.Models.ViewModels.CreateBlog
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-light">
+            <form method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="header" class="form-label">Title:</label>
+                    <input type="text" class="form-control" id="title" name="title" asp-for="Title">
+                </div>
+                <div class="mb-3">
+                    <label for="header" class="form-label">Header:</label>
+                    <input type="text" class="form-control" id="header" name="header" asp-for="Header">
+                </div>
+                <div class="mb-3">
+                    <h4>On which topic will be this Blog</h4>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Politic" name="topic">
+                                <label class="form-check-label" for="checkbox1" >
+                                    Politic
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Health" name="topic">
+                                <label class="form-check-label" for="checkbox2">
+                                    Health
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Education" name="topic">
+                                <label class="form-check-label" for="checkbox3">
+                                    Education
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Music" name="topic">
+                                <label class="form-check-label" for="checkbox4" >
+                                    Music
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Travel" name="topic">
+                                <label class="form-check-label" for="checkbox3" >
+                                    Travel
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Party" name="topic">
+                                <label class="form-check-label" for="checkbox4" >
+                                    Party
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="textarea" class="form-label">Textarea:</label>
+                    <textarea class="form-control" id="textarea" rows="6" asp-for="About"></textarea>
+                </div>
+                <div class="mb-3">
+                    <input type="file" id="files" name="file" accept="image/*" onchange="document.getElementById('FrontImagePrv').src = window.URL.createObjectURL(this.files[0])" style="display:none;" />
+                    <label for="files" style="float:left;color:black;background:cyan;border-radius:50%;padding-left:5px;padding-top:2px;cursor:pointer;"><img src="~/Images/kamera1.png" style="width:50px;"></label>
+                    &nbsp; <span style="color:white;">Your selected file: </span><span id="file-name" style="color:white;">None</span>
+                    <br />
+                    <img id="FrontImagePrv" width="150" height="150" style="border:1px;margin-top:30px;margin-bottom:30px;" />
+               
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(".custom-file-input").on("change", function () {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
+</script>
+<script>
+
+    let inputFile = document.getElementById('files');
+    let fileNameField = document.getElementById('file-name');
+
+    inputFile.addEventListener('change', function (event) {
+
+        let uploadedFileName = event.target.files[0].name;
+
+        fileNameField.textContent = uploadedFileName;
+    });
+</script>

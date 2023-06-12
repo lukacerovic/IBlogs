@@ -1,0 +1,87 @@
+﻿@model List<IBlogs.Models.ViewModels.ProfileRequest>
+@using IBlogs.Models.Domain;
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Profile> signInManager
+@inject UserManager<Profile> userManager
+<div class="container mt-3 mb-5">
+    <div class="row">
+
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var obj in Model)
+            {
+                <div class="col-6 col-md-4 col-lg-3 mb-3 mx-3 px-3">
+                    <div>
+                        @if (obj.ProfileImage != null)
+                        {
+                            <img src="@Url.Action("GetImage", "Image", new { id = obj.ProfileId })" class="list-img">
+                        }
+                        else
+                        {
+                            if (obj.Gender == "Male")
+                            {
+                                <img src="~/Images/male_user.png" style="float:left;" class="list-img">
+                            }
+                            if (obj.Gender == "Female")
+                            {
+                                <img src="~/Images/female_user.png" style="float:left;" class="list-img">
+                            }
+                            if (obj.Gender == "Other" || obj.Gender == "Gender")
+                            {
+                                <img src="~/Images/Other.png" style="float:left;" class="list-img">
+                            }
+
+                        }
+                    </div>
+                    <div class="text-light">
+                        <h3>@obj.Name @obj.LastName</h3>
+                        <p>I like to speak about:</p>
+                        @if (obj.MyTopics != null && obj.MyTopics.Count > 0)
+                        {
+                            @foreach (var topic in obj.MyTopics)
+                            {
+                                if (topic.Contains(","))
+                                {
+                                    var individualTopics = topic.Split(',');
+                                    foreach (var individualTopic in individualTopics)
+                                    {
+                                        <span class="badge badge-sm bg-secondary m-1">@individualTopic.Trim()</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="badge badge-sm bg-secondary m-1">@topic</span>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <span class="badge badge-sm bg-secondary bg-danger m-1">No specific topics</span>
+                        }
+                        <h4 class="mt-3">Contact me via mail: </h4>
+                        <h5>@obj.Email</h5>
+                        @if (signInManager.IsSignedIn(User))
+                        {
+                            <a class="btn btn-secondary"
+                               asp-controller="Profile"
+                               asp-action="MyProfile"
+                               asp-route-id="@obj.ProfileId">
+                                Check my profile
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-secondary"
+                                asp-area="Identity"
+                                asp-page="/Account/Login">
+                                Check my profile
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        }
+
+
+    </div>
+</div>
